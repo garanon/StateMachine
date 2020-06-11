@@ -3,30 +3,21 @@ using System.Collections.Generic;
 
 namespace StateMachine.Scripts
 {
-    public abstract class StateMachineComponentBase : IStateMachineComponent
+    public abstract class StateMachineComponentBase
     {
-        #region Private Fields
+        #region Properties
 
-        private IDictionary<IStateMachineComponent, Func<bool>> transitionList = new Dictionary<IStateMachineComponent, Func<bool>>();
+        public virtual string Name { get; set; }
 
         #endregion
 
-        #region IStateMachineComponent Implementation
+        #region Private Fields
 
-        public string Name { get; set; }
+        private IDictionary<StateMachineComponentBase, Func<bool>> transitionList;
 
-        public virtual IStateMachineComponent Evaluate()
-        {
-            foreach (var pair in transitionList)
-            {
-                if (pair.Value())
-                {
-                    return pair.Key;
-                }
-            }
+        #endregion
 
-            return this;
-        }
+        #region Abstract Methods
 
         public abstract void OnEnter();
 
@@ -34,8 +25,29 @@ namespace StateMachine.Scripts
 
         #region Public Methods
 
-        public void AddTransition(IStateMachineComponent toComponent, Func<bool> predicate)
+        public virtual StateMachineComponentBase Evaluate()
         {
+            if (transitionList != null && transitionList.Count > 0)
+            {
+                foreach (var pair in transitionList)
+                {
+                    if (pair.Value())
+                    {
+                        return pair.Key;
+                    }
+                }
+            }
+
+            return this;
+        }
+
+        public virtual void AddTransition(StateMachineComponentBase toComponent, Func<bool> predicate)
+        {
+            if (transitionList == null)
+            {
+                transitionList = new Dictionary<StateMachineComponentBase, Func<bool>>();
+            }
+
             transitionList[toComponent] = predicate;
         }
 

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace StateMachine.Scripts
 {
-    public abstract class StateMachine<T> : StateMachineComponentBase where T : IStateMachineManager
+    public abstract class StateMachine<T> : StateMachineComponentBase
     {
         #region Properties
 
@@ -15,8 +15,8 @@ namespace StateMachine.Scripts
 
         #region Private Fields
 
-        private IList<IStateMachineComponent> stateList;
-        private IStateMachineComponent currentState;
+        private IList<StateMachineComponentBase> stateList;
+        private StateMachineComponentBase currentState;
 
         #endregion
 
@@ -38,7 +38,7 @@ namespace StateMachine.Scripts
 
         #region StateMachineComponentBase Implementation
 
-        public override IStateMachineComponent Evaluate()
+        public override StateMachineComponentBase Evaluate()
         {
             var nextState = base.Evaluate();
             if (nextState != this)
@@ -70,7 +70,7 @@ namespace StateMachine.Scripts
         public virtual void Initialise(T owner)
         {
             Owner = owner;
-            stateList = new List<IStateMachineComponent>();
+            stateList = new List<StateMachineComponentBase>();
 
             InitialiseStates();
             InitialiseBranches();
@@ -78,7 +78,7 @@ namespace StateMachine.Scripts
             currentState = GetState(EntryStateName);
         }
 
-        public void AddComponent(IStateMachineComponent component)
+        public void AddComponent(StateMachineComponentBase component)
         {
             stateList.Add(component);
         }
@@ -90,7 +90,7 @@ namespace StateMachine.Scripts
             fromState.AddTransition(toState, predicate);
         }
 
-        public IStateMachineComponent GetState(string name)
+        public StateMachineComponentBase GetState(string name)
         {
             return stateList.FirstOrDefault(state => state.Name == name);
         }
