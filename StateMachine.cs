@@ -22,8 +22,8 @@ namespace StateMachine.Scripts
 
         #region Abstract Methods
 
-        public abstract void InitialiseStates();
-        public abstract void InitialiseBranches();
+        protected abstract void InitialiseStates();
+        protected abstract void InitialiseBranches();
 
         #endregion
 
