@@ -8,12 +8,13 @@ namespace StateMachine.Scripts
         #region Properties
 
         public virtual string Name { get; set; }
+        public virtual int TransitionRuleCount => transitionList?.Count ?? 0;
 
         #endregion
 
         #region Private Fields
 
-        private IDictionary<StateMachineComponentBase, Func<bool>> transitionList;
+        private IDictionary<StateMachineComponentBase, StateTransitionRuleBase> transitionList;
 
         #endregion
 
@@ -31,7 +32,7 @@ namespace StateMachine.Scripts
             {
                 foreach (var pair in transitionList)
                 {
-                    if (pair.Value())
+                    if (pair.Value.Evaluate())
                     {
                         return pair.Key;
                     }
@@ -41,14 +42,19 @@ namespace StateMachine.Scripts
             return this;
         }
 
-        public virtual void AddTransition(StateMachineComponentBase toComponent, Func<bool> predicate)
+        public virtual void AddTransition(StateMachineComponentBase toComponent, StateTransitionRuleBase transitionRuleRule)
         {
             if (transitionList == null)
             {
-                transitionList = new Dictionary<StateMachineComponentBase, Func<bool>>();
+                transitionList = new Dictionary<StateMachineComponentBase, StateTransitionRuleBase>();
             }
 
-            transitionList[toComponent] = predicate;
+            transitionList[toComponent] = transitionRuleRule;
+        }
+
+        public virtual bool IsFinished()
+        {
+            return true;
         }
 
         #endregion

@@ -10,6 +10,7 @@ namespace StateMachine.Scripts
 
         public abstract string EntryStateName { get; }
         protected T Owner { get; private set; }
+        public override int TransitionRuleCount => currentState.TransitionRuleCount;
 
         #endregion
 
@@ -47,6 +48,7 @@ namespace StateMachine.Scripts
             }
 
             var newState = currentState.Evaluate();
+
             if (newState != currentState)
             {
                 currentState = newState;
@@ -85,9 +87,14 @@ namespace StateMachine.Scripts
 
         public void AddBranch(string from, string to, Func<bool> predicate)
         {
+            AddBranch(from, to, new PredicateStateTransitionRule(predicate));
+        }
+
+        public void AddBranch(string from, string to, StateTransitionRuleBase transitionRuleRule)
+        {
             var fromState = GetState(from);
             var toState = GetState(to);
-            fromState.AddTransition(toState, predicate);
+            fromState.AddTransition(toState, transitionRuleRule);
         }
 
         public StateMachineComponentBase GetState(string name)
